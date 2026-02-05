@@ -1,4 +1,4 @@
-#HTTP/1.1 server in C
+# HTTP/1.1 server in C
 
 This is an HTTP/1.1 server that runs over an open port on a Debian system.
 
