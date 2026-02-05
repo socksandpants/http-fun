@@ -1,0 +1,66 @@
+Uniform Resource Identifie
+  - A sequence of characters that identifies resources.
+  - No limit on the nature of the resource or reason for ID'ing resource.
+  - Is essentially the idea of having an address (or ID) for shit on a network
+    so that things in that network can see the resource.
+  - Interpretation of a URI is consistent regardless of context. That interpretation
+    is up to the implementation of the end user though.
+
+  Generic syntax of a URI are as follows (RFC3986)
+    URI         = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+      hier-part   = "//" authority path-abempty
+                / path-absolute
+                / path-rootless
+                / path-empty
+          authority   = [ userinfo "@" ] host [ ":" port ]
+          userinfo    = *( unreserved / pct-encoded / sub-delims / ":" )
+            host        = IP-literal / IPv4address / reg-name
+  *look at RFC3989-3.2.2.Host for more host info*
+  port        = *DIGIT
+
+
+  - Example URI
+    foo://example.com:8042/over/there?name=ferret#nose
+
+
+Identifiers in HTTP
+...
+
+HTTP/1.1 Message format
+  - Servers and clients communicate via HTTP messages (request OR a response).
+  - Practically speaking, servers only expect a request and clients only expect a response.
+
+  - Recipient of a message MUST parse a message as a sequence of octets in a superset of ASCII (0-255, 00-FF). DO NOT parse message as a stream of unicode characters.
+  - Server and client have special behavior that is really specific (for carriage return and line feed character edge cases for security).
+
+  - HTTP messages starts with the version. HTTP 1.0 requests should work with 1.1 servers.
+
+  - The next line is the "request-line" that has a method token, a single space, the request-target, and another single space (ending with the HTTP-version).
+  - Be wary of how the server treats white space because of possible request smuggling security vulnerabilities.
+
+  - The next request-target is the resource that the server is being asked to apply the request to. No whitespace is allowed. No autocorrection of the request-target should be done.
+  - Server and client have specific behavior for handling some edge cases.
+  - There are four different ways that a request-target is formatted
+    1. origin-form (absolute-path with a query, HOST afterwards)
+    2. absolute-form (absolute-URI)
+    3. authority-form (uri-host : port, HOST afterwards)
+    4. asterisk-form (used for server-wide OPTIONS request)
+
+  - The server receives a message with these parts and reconstructs the target-uri.
+    GET /pub/WWW/TheProject.html HTTP/1.1
+    Host: www.example.org
+
+    reconstructs into
+
+    https://www.example.org/pub/WWW/TheProject.html
+
+  - The other way messages are used are as responses, or status-line(s).
+  - These are formatted with the HTTP version, a single space, the status code, another single space, and then an OPTIONAL "reason-phrase." White-space delimited word boundaries is allowed with a lot of specifics though.
+  - Status codes are three digit numbers, reason-phrase is completely optional textual description that a sever sends to a client.
+
+
+
+HTTP Methods
+...
+
+HTTP status codes
