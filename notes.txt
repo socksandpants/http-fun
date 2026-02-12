@@ -1,4 +1,4 @@
-Uniform Resource Identifie
+Uniform Resource Identifiers
   - A sequence of characters that identifies resources.
   - No limit on the nature of the resource or reason for ID'ing resource.
   - Is essentially the idea of having an address (or ID) for shit on a network
@@ -21,10 +21,6 @@ Uniform Resource Identifie
 
   - Example URI
     foo://example.com:8042/over/there?name=ferret#nose
-
-
-Identifiers in HTTP
-...
 
 HTTP/1.1 Message format
   - Servers and clients communicate via HTTP messages (request OR a response).
@@ -59,8 +55,32 @@ HTTP/1.1 Message format
   - Status codes are three digit numbers, reason-phrase is completely optional textual description that a sever sends to a client.
 
 
-
 HTTP Methods
-...
+	- HTTP/1.0 has GET, HEAD, POST, along with PUT, DELETE, LINK, and UNLINK.
+	- HTTP/1.1 added PUT, DELETE, CONNECT, OPTIONS, and TRACE.
+
+	- GET is a request for a represenation of a resource.
+	- HEAD is a GET without representation of a resource.
+	- POST is a request to process a resource.
+	- PUT is a POST but the client specifies the target location.
+	- DELETE is a delete request.
+	- CONNECT establishes a TCP/IP tunnel to a specified server. Used for proxies with TLS
+	- OPTIONS is basically a debug request.
+	- TRACE ""
+	- PATCH ...
 
 HTTP status codes
+	...
+
+
+HTTP headers
+	- HOLY FUCK THERE ARE SO MANY
+
+HTTP Content Negotiation
+	- Given headers in a request a client can give a preference for a version of a resource. Example, languages or file types.
+	- 
+
+Same Origin Policy and Cross-origin resource sharing
+	- SOP is a security measure that is taken to protect pages within the HTML DOM. If a user agent tries to access a page it is allowed only if both pages have the same origin (found in the headers).
+	- Sometimes we want to bypass this ("cross-domain" requests) so we can use CORS to safely do this.
+	- WebSockets is the most modern version of bypassing this policy.

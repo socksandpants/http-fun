@@ -14,13 +14,21 @@
 *     - Beej's guide to network programming (for networking brushing up)
 */
 
-/* stdin args? */
-// 1. address of server to reach
+#define handle_error(msg) \
+  do { perror(msg); exit(EXIT_FAILURE); } while(0)
 
 int main (int argc, char** argv) {
-  char* port;
+  char port;
+  char* address;
 
-  if (argc != 3) { exit(EXIT_FAILURE); }
+
+  if (argc != 3) { handle_error("give a port and an address.\n"); }
+
+  port = atoi(argv[1]);
+  address = argv[2];
+
+  // HTTP/1.1 connections are "persistent," what this actually means is parallel sending of
+  // requests and reponses. For the client it is only concerned with requests. SEE rfc9112.9.3
 
 
 

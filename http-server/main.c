@@ -23,6 +23,7 @@
 #define handle_error(msg) \
   do { perror(msg); exit(EXIT_FAILURE); } while(0)
 #define NUM_CONNECTIONS 20
+#define GET "GET"
 
 int setup_conn(int sockfd, struct sockaddr_storage conn_addr, socklen_t addr_size) {
   int new_fd, status;
@@ -36,19 +37,58 @@ int setup_conn(int sockfd, struct sockaddr_storage conn_addr, socklen_t addr_siz
   return new_fd;
 }
 
-// A request will cause the server to do a switch(case) to figure out
-// exactly what the response HTTP message will be. Error code handling
-// will be done in their respective functions, NOT in main(),
+// This function is called when the server receives an invalid message and
+// wants to handle it. I think it always sends and error code but there's
+// probably an edge case for throwing out a request entirely.
+void graceful_error() {
+  return;
+}
+// QUESTION????
+// WHAT DOES THE SERVER DO WHEN A MESSAGE IS IN UNICODE?
+
 char* process_message(char* message) {
   // check to see if the message is in ASCII
+  char ascii_flag = 0;
+  for (int x = 0; x < strlen(message); x++) {
+    if (message[x] < 0 || message[x] > 128) {
+      graceful_error();
+      return -1;
+    }
+  }
 
   char[256] response;
-  memset(&reponse, 0, sizeof(response));
+  memset(&reponse, 0, sizeof(response) * 256);
 
   // request line = method-token, single space, request-target, single space, http version
   // request target functionality dependent on its format
-  //
-  // maybe create test cases for http requests?
+
+  // status line = HTTP-version SP status-code SP [ reason-phrase ]
+  // field line = field-name ":" OWS field-value OWS
+  // message body = ...
+
+  char* method_token;
+
+  method_token = strtok(request, "");
+  if (token == NULL) graceful_error(); // empty message
+
+  // need to convert strings to ints for a switch case, can either hash OR do basic string comparisons
+
+  // case sensitive?
+  switch (method_token) {
+    case GET:
+      token = strtok(NULL, "");
+      break;
+    default:
+      // unknown method-token
+      break;
+  }
+
+  // PLAN
+  //  1. Make server create empty messages with nothing in the message body.
+  //      - request line
+  //      - request target creation
+  //      - status line
+  //      - field line
 
   return response;
 }
