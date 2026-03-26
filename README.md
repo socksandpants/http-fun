@@ -4,9 +4,6 @@
 > requests by sending HTTP responses. (RFC9110)
 
 This is an HTTP/1.1 server that runs over an open port on a Debian system.
-It is compiled in C but spins up a Ruby process to deal with route matching
-a request. The C portion is responsible for the socket connections, HTTP
-parsing, and file serving.
 
 
 ### Server methods 
