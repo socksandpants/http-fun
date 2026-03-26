@@ -1,21 +1,29 @@
-# HTTP/1.1 server in C
-
-This is an HTTP/1.1 server that runs over an open port on a Debian system.
+# HTTP/1.1 server
 
 > An HTTP "server" is a program that accepts connections in order to service HTTP
 > requests by sending HTTP responses. (RFC9110)
 
-All that is needed to compile and run this server is either a version of gcc that supports
-C17. If for some reason you are not able to use gcc the Makefile is given and the program is simple enough for you to change the compiler options easily.
-
-
-*Some stuff about HTTP/1.1*
+This is an HTTP/1.1 server that runs over an open port on a Debian system.
+It is compiled in C but spins up a Ruby process to deal with route matching
+a request. The C portion is responsible for the socket connections, HTTP
+parsing, and file serving.
 
 
 ### Server methods 
 
+The minimum methods needed for a program to be HTTP complient are GET and
+HEAD.
+
 ### Server responses
+
+The server will respond with the requested content if it is able to.
 
 ### Server error codes
 
+The server will send correct error messages if things go haywire.
+
 ### Client behavior
+
+The example client is a simple C program that sends pre-made HTTP requests
+and prints the responses to a file with the name "response{# program}.txt"
+
