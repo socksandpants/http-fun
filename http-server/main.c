@@ -33,24 +33,15 @@ typedef struct Header {
   struct Header *next;
 }
 
-// generalize to http_message?
 typedef struct {
   char* method;
   char* target_uri;
   char* version;
   Header* headers;	
   char* body;
-} http_request;
+} http_message;
 
-typedef struct {
-  char* method;
-  char* target_uri;
-  char* version;
-  Header* headers;	
-  char* body;
-} http_response;
-
-// Function to listen on a port and accept a connection to it (BLOCKING)
+// listen on a port and accept a connection to it (BLOCKING)
 int setup_conn(int sockfd, struct sockaddr_storage conn_addr, socklen_t addr_size) {
   int new_fd, status;
   status = listen(sockfd, NUM_CONNECTIONS);
@@ -71,42 +62,50 @@ void graceful_error() {
 }
 
 // Function to check if a string is ascii
-bool is_ascii(char* string) {
+bool is_ascii(const char* string) {
   for (; *string; string++) {
     if ((unsigned char) *string > 127) return false;
   }
   return true;
 }
 
-// TODO: need to create a void free_header(Header* header)
-
-Header* headers_parse(const char* raw) {
+Header* headers_parse(const char* raw, int request_length) {
   Header* head = NULL;
   Header* tail = NULL;
-  char* token;
-  // TODO: DON'T USE strtok() HERE, USE memchr(), also maybe check for \r\n
-  // bs
+  char* position = raw;
+  size_t bytes_left = request_length; 
+  // TODO: I NEED THE FUCKING LENGTH OF THE LINE HERE
+
+  while (bytes_left > 0) {
+    char* new_line = memchr(position, '\n', bytes_left);
+    // step 1, find length of the line then ensure it's \r\n
+    //        note: rfc9112 says message MUST have \r\n but in practice it's \n and \r\n, for my sake I am just accepting \n
+    
+    // step 2, find the ':'
   
-  return ;
+    // step 3, throw header name and value into linked list, loop over if more message left
+
+    // required HOST header, what todo if no HOST header? reject?
+  }
+  
+  return head;
 }
 
 // This function receives read bytes from the open port and returns the
 // full http response.
-http_response request_parse(char* raw) {
+http_message request_parse(const char* raw, int request_length) {
   // request line = method-token, single space, request-target, single space, http version
   //
-  // request target functionality dependent on its format
-  // required HOST header
-  // body is usually absent
-
+  //    request target functionality dependent on its format
+  //    body is usually absent
   // status line = HTTP-version SP status-code SP [ reason-phrase ]
   // field line = field-name ":" OWS field-value OWS
   // message body = ...
-  // Content-Length or Transfer-Encoding expected with body
-  http_request request;
-  http_response response;
+  //    Content-Length or Transfer-Encoding expected with body
+  http_message request;
+  http_message response;
   char* token;
-	
+
   if (!(is_ascii(raw))) return "err: non-ascii format";
 
   token = strtok(raw, " ");
@@ -121,10 +120,11 @@ http_response request_parse(char* raw) {
   if (token == NULL) return "empty version"; 
   request.version = token;
 	
-  token = strchr(raw, "\n");
-  if (token == NULL) return "no second line";
-  token++;
-  // headers_parse()?
+  char* position = memchr(raw, '\n', request_length); // do I want to make this accept "\r\n"
+  if (position == NULL) return "no second line";
+  // want to send ptr to the second line along with the length of the message
+  headers_parse(position + 1, request_length);
+  
   // body_read()?
 
   // REQUEST PARSED, CREATE RESPONSE
@@ -146,19 +146,17 @@ int main (int argc, char** argv) {
   socklen_t addr_size;
   int sockfd, new_fd, bytes_read;
   char message[256];
-  char* response;
+  http_message response;
   char* port;
   int status = -1;
 
-	// Check for Ruby? I can exec() call the ruby interpreter for a version
-	
   if (argc != 2) {
     perror("You must feed this server a port (don't use 80 unless you configure stuff right)!\n   $ ./http-server ####\n");
     exit(EXIT_FAILURE);
   }
   port = argv[1];
 
-	// server_init()?
+  // server_init()?
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
@@ -193,9 +191,7 @@ int main (int argc, char** argv) {
     if (bytes_read > 256) handle_error("too large of a message...");
 
     // process an HTTP message
-    response = request_parse(message);
-    printf("    %s\n\n", response);
-		
+    response = request_parse(message, bytes_read);
     // send HTTP response
 
     // end TCP connection, DIFFERENT for 1.1
